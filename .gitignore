@@ -38,3 +38,19 @@ yarn-error.log*
 
 # javascript
 *.map
+
+# docker
+.dockerignore
+docker-compose.override.yml
+.docker/
+**/Dockerfile.dev
+**/docker-compose.dev.yml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
