@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getRecipes } from '../../../lib/db';
+import { PrismaClient } from 'lib/generated/prisma'; // path custom sesuai output kamu
 
+
+const prisma = new PrismaClient();
 export async function GET(request) {
   try {
-    // Get all recipes from database
-    const recipes = await getRecipes();
-    
+const recipes = await prisma.recipe.findMany();
     return NextResponse.json({
       success: true,
       data: recipes,
