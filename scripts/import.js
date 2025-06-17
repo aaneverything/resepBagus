@@ -8,6 +8,10 @@ const prisma = new PrismaClient();
 
 const filePath = path.join(process.cwd(), 'prisma', 'Indonesian_Food_Recipes.csv');
 
+if (typeof window !== 'undefined') {
+  throw new Error('Prisma Client is not supported in the browser.');
+}
+
 async function main() {
   const fileContent = fs.readFileSync(filePath);
   const records = parse(fileContent, {

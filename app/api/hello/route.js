@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from 'lib/generated/prisma'; // path custom sesuai output kamu
 
+if (typeof window !== 'undefined') {
+  throw new Error('Prisma Client is not supported in the browser.');
+}
+
 const prisma = new PrismaClient();
 export async function GET() {
   try {

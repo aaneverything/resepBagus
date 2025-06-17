@@ -1,3 +1,7 @@
+if (typeof window !== 'undefined') {
+  throw new Error('Prisma Client is not supported in the browser.');
+}
+
 const { PrismaClient } = require('../lib/generated/prisma'); // ✅ SESUAI DENGAN output
 const prisma = new PrismaClient();
 

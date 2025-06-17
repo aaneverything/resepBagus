@@ -1,7 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
-  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -14,47 +12,84 @@ model User {
   name      String
   email     String    @unique
   password  String
-  image     String?   // Foto profil opsional
+  image     String? // Foto profil opsional
+  accounts  Account[]
+  sessions  Session[]
   recipes   Recipe[]
   reviews   Review[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
 
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+
+  token_type    String?
+  scope         String?
+  id_token      String?
+  session_state String?
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
 model Recipe {
-  id          String        @id @default(cuid())
+  id          String       @id @default(cuid())
   title       String
   description String
   image       String?
-  author      User          @relation(fields: [authorId], references: [id])
+  author      User         @relation(fields: [authorId], references: [id])
   authorId    String
   ingredients Ingredient[]
   steps       Step[]
   reviews     Review[]
   tags        RecipeTag[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Ingredient {
-  id        String   @id @default(cuid())
-  name      String
-  recipe    Recipe   @relation(fields: [recipeId], references: [id])
-  recipeId  String
+  id       String @id @default(cuid())
+  name     String
+  recipe   Recipe @relation(fields: [recipeId], references: [id])
+  recipeId String
 }
 
 model Step {
-  id        String   @id @default(cuid())
-  order     Int
-  content   String
-  recipe    Recipe   @relation(fields: [recipeId], references: [id])
-  recipeId  String
+  id       String @id @default(cuid())
+  order    Int
+  content  String
+  recipe   Recipe @relation(fields: [recipeId], references: [id])
+  recipeId String
 }
 
 model Review {
   id        String   @id @default(cuid())
   content   String
-  rating    Int      // 1–5
+  rating    Int // 1–5
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   recipe    Recipe   @relation(fields: [recipeId], references: [id])
@@ -63,8 +98,8 @@ model Review {
 }
 
 model Tag {
-  id      String       @id @default(cuid())
-  name    String       @unique
+  id      String      @id @default(cuid())
+  name    String      @unique
   recipes RecipeTag[]
 }
 
