@@ -8,18 +8,21 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  name      String
-  email     String    @unique
-  password  String
-  image     String? // Foto profil opsional
-  accounts  Account[]
-  sessions  Session[]
-  recipes   Recipe[]
-  reviews   Review[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  name           String
+  username       String?   @unique
+  email          String    @unique
+  password       String?   
+  image          String?
+  emailVerified  DateTime?
+  recipes        Recipe[]
+  reviews        Review[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  accounts       Account[]
+  sessions       Session[]
 }
+
 
 model Account {
   id                String  @id @default(cuid())
@@ -30,7 +33,6 @@ model Account {
   refresh_token     String?
   access_token      String?
   expires_at        Int?
-
   token_type    String?
   scope         String?
   id_token      String?
