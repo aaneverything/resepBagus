@@ -22,40 +22,35 @@ A modern recipe sharing and management platform built with **Next.js 13+ App Rou
 ## 📁 Project Structure
 
 ```
-ourrecipes/
-├── 📁 app/                     # Next.js App Router directory
-│   ├── 📄 layout.js           # Root layout component
-│   ├── 📄 page.js             # Home page
-│   ├── 📁 about/              # About page route
-│   │   └── 📄 page.js
-│   ├── 📁 api/                # API routes
-│   │   ├── 📁 hello/          # Test API endpoint
-│   │   │   └── 📄 route.js
-│   │   └── 📁 recipes/        # Recipe API endpoints
-│   │       └── 📄 route.js    # GET & POST /api/recipes
-│   └── 📁 recipes/            # Recipe pages
-│       ├── 📄 page.js         # Recipe listing page
-│       └── 📁 [id]/           # Dynamic recipe detail page
-│           └── 📄 page.js
-├── 📁 components/             # Reusable React components
-│   └── 📄 RecipeCard.jsx     # Recipe card component
-├── 📁 lib/                   # Utility libraries
-│   └── 📄 db.js              # Database helper functions
-├── 📁 public/                # Static assets
-├── 📁 styles/                # Global styles
-│   └── 📄 globals.css        # Global CSS with Tailwind
-├── 📁 types/                 # Type definitions (JSDoc)
-│   └── 📄 recipe.js          # Recipe type definitions
-├── 📄 middleware.js          # Next.js middleware
-├── 📄 jsconfig.json          # JavaScript configuration
-├── 📄 next.config.mjs        # Next.js configuration
-├── 📄 package.json           # Dependencies and scripts
-├── 📄 eslint.config.mjs      # ESLint configuration
-├── 📄 postcss.config.mjs     # PostCSS configuration
-├── 📄 tailwind.config.js     # Tailwind CSS configuration
-├── 📄 Dockerfile            # Docker configuration
-├── 📄 docker-compose.yml    # Docker Compose setup
-└── 📄 README.md             # Project documentation
+app/
+├── api/
+│   ├── auth/[…nextauth]/route.js         → NextAuth API handler
+│   ├── search/
+│   │   ├── text/route.js                 → Search by text
+│   │   └── image/route.js                → Search by image (upload & ML)
+│   ├── recipes/
+│   │   ├── route.js                      → Create recipe (if needed)
+│   │   ├── [id]/route.js                 → Get/update/delete recipe
+│   │   └── popular/route.js              → Get popular recipes
+│   ├── categories/route.js               → Get categories
+│   └── reviews/
+│       ├── route.js                      → Post review (protected)
+│       └── [recipeId]/route.js           → Get all reviews for recipe
+│
+├── recipes/
+│   ├── [id]/
+│   │   └── page.js                       → Detail resep
+│   └── page.js                           → List resep
+│
+├── signin/
+│   └── page.js                           → Halaman login
+│
+├── dashboard/
+│   └── page.js                           → Rekomendasi, kategori, populer
+│
+├── layout.js
+└── page.js                               → Redirect ke /dashboard
+
 ```
 
 ## 🔗 API Endpoints
