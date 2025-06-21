@@ -16,11 +16,11 @@ const FormRegister = () => {
     const [state, formAction] = useActionState(registerCredentials, initialState);
     const router = useRouter();
 
-    useEffect(() => {
-        if (state?.success) {
-            router.push('/login');
-        }
-    }, [state?.success, router]);
+useEffect(() => {
+  if (state.success && state.email) {
+    router.push(`/verifyOtp?email=${encodeURIComponent(state.email)}`);
+  }
+}, [state?.success, state?.email, router]);
 
     return (
         <form action={formAction} className="space-y-4">

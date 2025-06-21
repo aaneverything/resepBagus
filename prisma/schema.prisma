@@ -10,11 +10,12 @@ datasource db {
 model User {
   id             String    @id @default(cuid())
   name           String
-  username       String?   @unique
   email          String    @unique
   password       String?   
   image          String?
-  emailVerified  DateTime?
+   otp            String?
+  otpExpires     DateTime?
+  emailVerified Boolean? @default(false)
   recipes        Recipe[]
   reviews        Review[]
   createdAt      DateTime  @default(now())
