@@ -1,9 +1,11 @@
 "use client";
 
-import { useActionState } from 'react';
-import Link from 'next/link';
+import { use, useActionState } from 'react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 import { registerCredentials } from '@/lib/actions';
+import { RegisterButton } from '../atoms/Button';
 
 const initialState = {
     success: false,
@@ -12,9 +14,27 @@ const initialState = {
 
 const FormRegister = () => {
     const [state, formAction] = useActionState(registerCredentials, initialState);
+    const router = useRouter();
+
+    useEffect(() => {
+        if (state?.success) {
+            router.push('/login');
+        }
+    }, [state?.success, router]);
 
     return (
         <form action={formAction} className="space-y-4">
+            {state?.message ? (
+                <div className="p-4 mb-4 text-sm text-red-500 bg-red-100 rounded-md" role="alert" aria-live="polite" aria-atomic="true">
+                    <span className="font-medium">{state.message}</span>
+                </div>
+            ) : (
+                <div className="p-4 mb-4 text-sm text-red-500 bg-red-100 rounded-md" role="alert" aria-live="polite" aria-atomic="true">
+                    <span className="font-medium">Terjadi kesalahan, silakan coba lagi.</span>
+                </div>
+            )}
+        
+            
             <div className="mb-4">
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
                 <input type="text" id="name" name="name" placeholder="Enter your name" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
@@ -51,9 +71,7 @@ const FormRegister = () => {
                     </span>
                 </div>
             </div>
-            <button type="submit" className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                Register
-            </button>
+<RegisterButton />
             <div className="mt-4 text-sm text-gray-600">
                 Already have an account? <a href="/auth/login" className="text-blue-500 hover:underline">Login</a>
             </div>
