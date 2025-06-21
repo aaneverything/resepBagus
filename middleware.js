@@ -13,15 +13,16 @@ export async function middleware(req) {
     const session = await auth();
     const isLoggedIn = !!session?.user;
     const url = req.nextUrl.clone();
-    const { pathname } = url.pathname;
+    const pathname = url.pathname;
 
 
-    if (!isLoggedIn && protectedRoutes.some(route => pathname.startsWith(route))) {
-        return new NextResponse('Unauthorized', { status: 401 });
+    if (isLoggedIn && (pathname === '/login' || pathname === '/register')) {
+        url.pathname = '/';
+        return NextResponse.redirect(url);
     }
 
 
-    if (isLoggedIn && (pathname === '/login' || pathname === '/signin')) {
+    if (isLoggedIn && (pathname === '/login' || pathname === '/register')) {
         url.pathname = '/';
         return NextResponse.redirect(url);
     }
@@ -32,6 +33,6 @@ export const config = {
     matcher: [
         '/api/:path*',
         '/login',
-        '/signin'
+        '/register',
     ]
 };

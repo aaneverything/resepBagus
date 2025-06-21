@@ -65,9 +65,16 @@ const FormLogin = () => {
         <div className="text-sm text-red-500 mt-1">{state.errors?.password || ""}</div>
       </div>
       <LoginButton />
+      <div className="flex items-center justify-between mt-4">
+        <div className="text-sm">
+          <a href="/forgot" className="text-blue-500 hover:underline">
+            Forgot password?
+          </a>
+        </div>
+        </div>
       <div className="mt-4 text-sm text-gray-600">
         Don&apos;t have an account yet?{" "}
-        <a href="/auth/register" className="text-blue-500 hover:underline">
+        <a href="/register" className="text-blue-500 hover:underline">
           Register
         </a>
       </div>

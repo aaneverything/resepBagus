@@ -17,7 +17,7 @@ const FormRegister = () => {
     const router = useRouter();
 
 useEffect(() => {
-  if (state.success && state.email) {
+  if (state.success) {
     router.push(`/verifyOtp?email=${encodeURIComponent(state.email)}`);
   }
 }, [state?.success, state?.email, router]);
@@ -29,9 +29,7 @@ useEffect(() => {
                     <span className="font-medium">{state.message}</span>
                 </div>
             ) : (
-                <div className="p-4 mb-4 text-sm text-red-500 bg-red-100 rounded-md" role="alert" aria-live="polite" aria-atomic="true">
-                    <span className="font-medium">Terjadi kesalahan, silakan coba lagi.</span>
-                </div>
+            ""
             )}
         
             
