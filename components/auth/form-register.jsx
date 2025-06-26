@@ -71,7 +71,7 @@ useEffect(() => {
             </div>
 <RegisterButton />
             <div className="mt-4 text-sm text-gray-600">
-                Already have an account? <a href="/auth/login" className="text-blue-500 hover:underline">Login</a>
+                Already have an account? <a href="/login" className="text-blue-500 hover:underline">Login</a>
             </div>
         </form>
     );

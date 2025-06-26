@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import { PrismaClient } from '../lib/generated/prisma/index.js';
-
 import { parse } from 'csv-parse/sync';
 
 const prisma = new PrismaClient();
