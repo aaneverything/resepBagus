@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function SearchBar() {
   const [bahan, setBahan] = useState("");
-  const [judul, setJudul] = useState("");
+  // const [judul, setJudul] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
@@ -13,7 +13,12 @@ export default function SearchBar() {
   //search by bahan
   const handleSearch = async (e) => {
     e.preventDefault();
-    const bahanArr = bahan.split(",").map(b => b.trim()).filter(Boolean);
+   
+    //kondisi jika ada koma
+    const bahanArr = bahan.includes(",")
+      ? bahan.split(",").map(b => b.trim()).filter(Boolean)
+      : [];
+    const judul = !bahan.includes(",") ? bahan : "";
 
     
     const res = await fetch("/api/search", {
@@ -75,19 +80,19 @@ export default function SearchBar() {
           type="text"
           value={bahan}
           onChange={e => setBahan(e.target.value)}
-          placeholder="Cari resep dengan bahan (pisahkan koma)"
+          placeholder="Cari resep dengan bahan (pisahkan koma) atau judul"
           className="border px-3 py-2 rounded w-full"
         />
         <button className="bg-blue-500 text-white px-4 rounded">Cari</button>
       </form>
-       <input
+       {/* <input
           type="text"
           value={judul}
           onChange={e => setJudul(e.target.value)}
           placeholder="Cari resep berdasarkan judul"
           className="border px-3 py-2 rounded w-full"
         />
-        <button className="bg-blue-500 text-white px-4 rounded">Cari</button>
+        <button className="bg-blue-500 text-white px-4 rounded">Cari</button> */}
       <form onSubmit={handlePhotoSearch} className="flex gap-2 mb-4">
         <input
           type="file"
