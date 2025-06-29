@@ -1,127 +1,177 @@
 "use client";
 import { useRef, useState } from "react";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 
 export default function SearchBar() {
   const [bahan, setBahan] = useState("");
-  // const [judul, setJudul] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const fileInputRef = useRef(null);
 
-
-  //search by bahan
   const handleSearch = async (e) => {
     e.preventDefault();
-   
-    //kondisi jika ada koma
+    setErrorMsg("");
+    setLoading(true);
+
     const bahanArr = bahan.includes(",")
-      ? bahan.split(",").map(b => b.trim()).filter(Boolean)
+      ? bahan.split(",").map((b) => b.trim()).filter(Boolean)
       : [];
-    const judul = !bahan.includes(",") ? bahan : "";
+    const judul = !bahan.includes(",") ? bahan.trim() : "";
 
-    
-    const res = await fetch("/api/search", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        bahan: bahanArr,
-        judul,
-        top_n: 5
-      })
-    });
-    const data = await res.json();
-    setResults(Array.isArray(data) ? data : [data]);
+    if (!bahan.trim()) {
+      setErrorMsg("Masukkan bahan atau judul terlebih dahulu.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bahan: bahanArr, judul, top_n: 5 }),
+      });
+
+      const data = await res.json();
+      setResults(Array.isArray(data) ? data : [data]);
+    } catch (err) {
+      setErrorMsg("Gagal mencari resep. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
   };
-
-  //search by foto 
 
   const handlePhotoSearch = async (e) => {
     e.preventDefault();
+    setErrorMsg("");
     setLoading(true);
-    const formData = new FormData();
-    if (fileInputRef.current.files[0]) {
-      formData.append("image", fileInputRef.current.files[0]);
-    } else {
+
+    const file = fileInputRef.current.files?.[0];
+    if (!file) {
+      setErrorMsg("Pilih gambar terlebih dahulu.");
       setLoading(false);
       return;
     }
-    // Kirim ke endpoint ai-foto
-    const aiRes = await fetch("/api/ai-foto", {
-      method: "POST",
-      body: formData,
-    });
-    const aiData = await aiRes.json();
-    // aiData.bahan harus array of string
-    if (!aiData.bahan || !Array.isArray(aiData.bahan)) {
-      setResults([]);
+
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const aiRes = await fetch("/api/aiFoto", {
+        method: "POST",
+        body: formData,
+      });
+
+      const aiData = await aiRes.json();
+      console.log("AI response:", aiData);
+
+      // Extract labels from AI response array
+      let ingredients = [];
+      if (Array.isArray(aiData)) {
+        ingredients = aiData.map(item => item.label).filter(Boolean);
+      }
+
+      if (!ingredients || ingredients.length === 0) {
+        setErrorMsg("Gambar tidak dikenali atau bahan tidak ditemukan.");
+        setResults([]);
+        return;
+      }
+
+      const res = await fetch("/api/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bahan: ingredients, top_n: 5 }),
+      });
+
+      const data = await res.json();
+      console.log("Search results:", data);
+      setResults(Array.isArray(data) ? data : [data]);
+    } catch (err) {
+      setErrorMsg("Terjadi kesalahan saat pencarian.");
+    } finally {
       setLoading(false);
-      return;
     }
-    // Lanjutkan ke search by bahan
-    const res = await fetch("/api/search", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        bahan: aiData.bahan,
-        top_n: 5
-      })
-    });
-    const data = await res.json();
-    setResults(Array.isArray(data) ? data : [data]);
-    setLoading(false);
   };
 
-
   return (
-    <div>
+    <div className="max-w-3xl mx-auto px-4 py-6">
       <form onSubmit={handleSearch} className="flex gap-2 mb-4">
         <input
           type="text"
           value={bahan}
-          onChange={e => setBahan(e.target.value)}
+          onChange={(e) => setBahan(e.target.value)}
           placeholder="Cari resep dengan bahan (pisahkan koma) atau judul"
-          className="border px-3 py-2 rounded w-full"
+          className="border px-4 py-2 rounded w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button className="bg-blue-500 text-white px-4 rounded">Cari</button>
+        <button
+          type="submit"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded transition"
+        >
+          Cari
+        </button>
       </form>
-       {/* <input
-          type="text"
-          value={judul}
-          onChange={e => setJudul(e.target.value)}
-          placeholder="Cari resep berdasarkan judul"
-          className="border px-3 py-2 rounded w-full"
-        />
-        <button className="bg-blue-500 text-white px-4 rounded">Cari</button> */}
-      <form onSubmit={handlePhotoSearch} className="flex gap-2 mb-4">
+
+      <form onSubmit={handlePhotoSearch} className="flex gap-2 mb-4 items-center">
         <input
           type="file"
           accept="image/*"
           ref={fileInputRef}
           className="border px-3 py-2 rounded w-full"
         />
-        <button className="bg-blue-500 text-white px-4 rounded">Cari dengan Foto</button>
+        <button
+          type="submit"
+          className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded transition"
+        >
+          Cari dengan Foto
+        </button>
       </form>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-{results.map((item, idx) =>
-  item.id ? (
-    <Link
-      key={idx}
-      href={`/recipes/${item.id}`}
-      className="border rounded-lg p-4 shadow-md block hover:bg-gray-50 transition"
-    >
-      <h3 className="text-xl font-semibold mb-2">{item.judul}</h3>
-      <h3 className="text-sm font-medium mb-2">{item.bahan}</h3>
-    </Link>
-  ) : (
-    <div key={idx} className="border rounded-lg p-4 shadow-md opacity-50">
-      <h3 className="text-xl font-semibold mb-2">{item.judul}</h3>
-      <h3 className="text-sm font-medium mb-2">{item.bahan}</h3>
-      <div className="text-xs text-red-500">Resep tidak ditemukan di database</div>
-    </div>
-  )
-)}
-      </div>
+
+      {errorMsg && (
+        <div className="text-red-600 bg-red-100 p-3 rounded mb-4 text-sm">{errorMsg}</div>
+      )}
+
+      {loading && (
+        <div className="flex items-center gap-2 text-blue-600 mb-4">
+          <Loader2 className="animate-spin" size={20} />
+          Mencari resep...
+        </div>
+      )}
+
+      {!loading && results.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+          {results.map((item, idx) =>
+            item.id ? (
+              <Link
+                key={idx}
+                href={`/recipes/${item.id}`}
+                className="border rounded-lg p-4 shadow-md block hover:bg-gray-100 transition"
+              >
+                <h3 className="text-xl font-semibold mb-1">{item.judul}</h3>
+                <p className="text-sm text-gray-600 mb-2">{item.bahan}</p>
+                {item.author && (
+                  <p className="text-xs text-gray-500 italic">by {item.author}</p>
+                )}
+              </Link>
+            ) : (
+              <div
+                key={idx}
+                className="border rounded-lg p-4 shadow-md opacity-50 bg-gray-50"
+              >
+                <h3 className="text-xl font-semibold mb-1">{item.judul || "Tidak ditemukan"}</h3>
+                <p className="text-sm text-gray-600 mb-1">{item.bahan || "-"}</p>
+                <div className="text-xs text-red-500">Resep tidak ditemukan di database</div>
+              </div>
+            )
+          )}
+        </div>
+      )}
+
+      {!loading && results.length === 0 && bahan && (
+        <div className="text-center text-gray-500 mt-6 text-sm">
+          Tidak ada hasil ditemukan.
+        </div>
+      )}
     </div>
   );
 }
