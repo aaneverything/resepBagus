@@ -12,6 +12,7 @@ export default async function RecipeDetail({ params }) {
       ingredients: true,
       steps: true,
       author: { select: { name: true } },
+      tags: { include: { tag: true } },
     },
   });
 
@@ -23,6 +24,23 @@ export default async function RecipeDetail({ params }) {
     <div className="max-w-2xl mx-auto p-6 bg-white rounded shadow">
       <h1 className="text-2xl font-bold mb-2">{recipe.title}</h1>
       <div className="mb-2 text-gray-600">Oleh: {recipe.author?.name || "Unknown"}</div>
+
+      {/* Tags */}
+      {recipe.tags && recipe.tags.length > 0 && (
+        <div className="mb-4">
+          <div className="flex flex-wrap gap-2">
+            {recipe.tags.map((recipeTag) => (
+              <span
+                key={recipeTag.tag.id}
+                className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
+              >
+                {recipeTag.tag.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {recipe.image && (
         <img
           src={recipe.image}
@@ -30,7 +48,7 @@ export default async function RecipeDetail({ params }) {
           className="w-full h-64 object-cover rounded mb-4"
         />
       )}
-      <p className="mb-4">{recipe.description}</p>
+      {recipe.description && <p className="mb-4 text-gray-700">{recipe.description}</p>}
       <h2 className="font-semibold mt-4 mb-2">Bahan:</h2>
       <ul className="list-disc list-inside mb-4">
         {recipe.ingredients.map((ing) => (

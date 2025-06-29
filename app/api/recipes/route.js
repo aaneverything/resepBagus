@@ -44,17 +44,21 @@ export async function POST(request) {
     // Ambil form data
     const formData = await request.formData();
     const judul = formData.get('judul');
+    const description = formData.get('description') || '';
     const ingredientsRaw = formData.get('ingredients');
     const stepsRaw = formData.get('steps');
+    const tagsRaw = formData.get('tags');
     const foto = formData.get('foto');
 
     let ingredientsArr = [];
     let stepsArr = [];
+    let tagsArr = [];
     try {
       ingredientsArr = JSON.parse(ingredientsRaw);
       stepsArr = JSON.parse(stepsRaw);
+      tagsArr = tagsRaw ? JSON.parse(tagsRaw) : [];
     } catch (e) {
-      return NextResponse.json({ error: 'Format bahan/langkah tidak valid' }, { status: 400 });
+      return NextResponse.json({ error: 'Format data tidak valid' }, { status: 400 });
     }
 
     if (!judul || !Array.isArray(ingredientsArr) || ingredientsArr.length === 0 || !Array.isArray(stepsArr) || stepsArr.length === 0) {
@@ -76,11 +80,11 @@ export async function POST(request) {
     const user = await prisma.user.findUnique({ where: { email: session.user.email } });
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 401 });
 
-    // Simpan ke DB
+    // Simpan ke DB dengan tags
     const recipe = await prisma.recipe.create({
       data: {
         title: judul,
-        description: '',
+        description: description,
         image: imagePath,
         authorId: user.id,
         ingredients: {
@@ -89,8 +93,18 @@ export async function POST(request) {
         steps: {
           create: stepsArr.map((content, idx) => ({ order: idx + 1, content })),
         },
+        tags: {
+          create: tagsArr.map(tagName => ({
+            tag: {
+              connectOrCreate: {
+                where: { name: tagName.trim() },
+                create: { name: tagName.trim() }
+              }
+            }
+          }))
+        }
       },
-      include: { ingredients: true, steps: true },
+      include: { ingredients: true, steps: true, tags: { include: { tag: true } } },
     });
 
     return NextResponse.json({ id: recipe.id }, { status: 201 });

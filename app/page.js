@@ -1,16 +1,13 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchBar from "@/components/SearchBar";
-import { prisma } from "@/lib/prisma"; // Pastikan prisma sudah di-setup
+import PopularRecipes from "@/components/PopularRecipes";
+import CategoryRecipes from "@/components/CategoryRecipes";
+import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import RecipeList from "@/components/organisms/RecipeList";
-// import PopularRecipes from "@/components/PopularRecipes";
-// import CategoryRecipes from "@/components/CategoryRecipes";
 
 export default async function Home() {
-  
-
-
   const recipes = await prisma.recipe.findMany({
     orderBy: { createdAt: "desc" },
     take: 10,
@@ -21,7 +18,6 @@ export default async function Home() {
     },
   });
 
-  console.log("RESEP DI HOMEPAGE:", recipes);
   if (!recipes || recipes.length === 0) {
     return (
       <div className="container mx-auto px-4 py-6">
@@ -42,11 +38,11 @@ export default async function Home() {
       <main className="container mx-auto px-4 py-6">
         <SearchBar />
         <h2 className="text-xl font-bold mt-6 mb-2">Resep Terpopuler</h2>
-        {/* <PopularRecipes /> */}
+        <PopularRecipes />
         <h2 className="text-xl font-bold mt-6 mb-2">Semua Resep</h2>
         <RecipeList recipes={recipes} />
         <h2 className="text-xl font-bold mt-6 mb-2">Resep per Kategori</h2>
-        {/* <CategoryRecipes /> */}
+        <CategoryRecipes />
       </main>
       <Footer />
     </>

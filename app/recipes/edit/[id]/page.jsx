@@ -1,29 +1,56 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
-export default function CreateRecipePage() {
+export default function EditRecipePage({ params }) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { id } = params;
+  
   const [judul, setJudul] = useState("");
   const [description, setDescription] = useState("");
   const [ingredients, setIngredients] = useState([""]);
   const [steps, setSteps] = useState([""]);
   const [tags, setTags] = useState([""]);
   const [foto, setFoto] = useState(null);
+  const [currentImage, setCurrentImage] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const fileInputRef = useRef();
 
-  // Redirect ke login jika belum login
   if (status === "loading") return <div>Loading...</div>;
   if (!session) {
     if (typeof window !== "undefined") router.replace("/login");
     return <div>Redirecting...</div>;
   }
+
+  // Fetch recipe data
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      try {
+        const res = await fetch(`/api/recipes/${id}`);
+        if (!res.ok) throw new Error("Failed to fetch recipe");
+        
+        const recipe = await res.json();
+        setJudul(recipe.title);
+        setDescription(recipe.description || "");
+        setIngredients(recipe.ingredients.map(ing => ing.name));
+        setSteps(recipe.steps.sort((a, b) => a.order - b.order).map(step => step.content));
+        setTags(recipe.tags.map(t => t.tag.name));
+        setCurrentImage(recipe.image);
+      } catch (error) {
+        setError("Gagal memuat data resep");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecipe();
+  }, [id]);
 
   const handleFotoChange = (e) => {
     const file = e.target.files[0];
@@ -58,9 +85,10 @@ export default function CreateRecipePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setSaving(true);
     setError("");
     setSuccess("");
+
     const formData = new FormData();
     formData.append("judul", judul);
     formData.append("description", description);
@@ -70,28 +98,32 @@ export default function CreateRecipePage() {
     if (foto) formData.append("foto", foto);
     
     try {
-      const res = await fetch("/api/recipes", {
-        method: "POST",
+      const res = await fetch(`/api/recipes/${id}`, {
+        method: "PUT",
         body: formData,
       });
       const data = await res.json();
+      
       if (res.ok) {
-        setSuccess("Resep berhasil dibuat!");
-        setJudul(""); setDescription(""); setIngredients([""]); setSteps([""]); setTags([""]); setFoto(null); setPreview(null);
-        setTimeout(() => router.push(`/recipes/${data.id}`), 1500);
+        setSuccess("Resep berhasil diperbarui!");
+        setTimeout(() => router.push(`/recipes/${id}`), 1500);
       } else {
-        setError(data.error || "Gagal membuat resep");
+        setError(data.error || "Gagal memperbarui resep");
       }
     } catch (err) {
-      setError("Terjadi kesalahan saat membuat resep");
+      setError("Terjadi kesalahan saat memperbarui resep");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
+  if (loading) {
+    return <div className="max-w-xl mx-auto p-4 text-center">Loading...</div>;
+  }
+
   return (
     <div className="max-w-xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Buat Resep Baru</h1>
+      <h1 className="text-2xl font-bold mb-4">Edit Resep</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block font-medium mb-1">Judul Resep</label>
@@ -132,13 +164,36 @@ export default function CreateRecipePage() {
           ))}
         </div>
         <div>
-          <label className="block font-medium mb-1">Foto Resep (opsional)</label>
+          <label className="block font-medium mb-1">Foto Resep</label>
           <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFotoChange} className="border px-3 py-2 rounded w-full" />
+          
+          {/* Current Image */}
+          {currentImage && !preview && (
+            <div className="mt-2">
+              <p className="text-sm text-gray-600 mb-1">Foto saat ini:</p>
+              <img src={currentImage} alt="Current" className="max-h-40 rounded" />
+            </div>
+          )}
+          
+          {/* Preview new image */}
           {preview && <img src={preview} alt="Preview" className="mt-2 max-h-40 rounded" />}
         </div>
+        
         {error && <div className="text-red-500">{error}</div>}
         {success && <div className="text-green-600">{success}</div>}
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded" disabled={loading}>{loading ? "Menyimpan..." : "Buat Resep"}</button>
+        
+        <div className="flex gap-2">
+          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded" disabled={saving}>
+            {saving ? "Menyimpan..." : "Perbarui Resep"}
+          </button>
+          <button 
+            type="button" 
+            onClick={() => router.push(`/recipes/${id}`)}
+            className="bg-gray-600 text-white px-4 py-2 rounded"
+          >
+            Batal
+          </button>
+        </div>
       </form>
     </div>
   );
