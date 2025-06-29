@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import StarRating from "./StarRating";
 
 export default function MyRecipeCard({ recipe }) {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -60,9 +61,19 @@ export default function MyRecipeCard({ recipe }) {
         </div>
       )}
 
-      <div className="flex justify-between items-center text-sm text-gray-500 mb-3">
+      <div className="flex justify-between items-center text-sm text-gray-500 mb-2">
         <span>{recipe.ingredients.length} bahan</span>
         <span>{recipe._count.reviews} review</span>
+      </div>
+
+      {/* Rating */}
+      <div className="mb-3">
+        <StarRating 
+          rating={recipe.avgRating || 0}
+          reviewCount={recipe._count.reviews}
+          showCount={true}
+          size="sm"
+        />
       </div>
 
       <div className="flex gap-2">

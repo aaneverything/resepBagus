@@ -36,7 +36,6 @@ export default async function Home() {
     <>
       <Navbar />
       <main className="container mx-auto px-4 py-6">
-        <SearchBar />
         <h2 className="text-xl font-bold mt-6 mb-2">Resep Terpopuler</h2>
         <PopularRecipes />
         <h2 className="text-xl font-bold mt-6 mb-2">Semua Resep</h2>

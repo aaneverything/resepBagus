@@ -25,9 +25,22 @@ export default async function AccountPage() {
     include: {
       ingredients: true,
       tags: { include: { tag: true } },
+      reviews: true,
       _count: { select: { reviews: true } }
     },
     orderBy: { createdAt: 'desc' }
+  });
+
+  // Calculate average rating for each recipe
+  const recipesWithRating = userRecipes.map(recipe => {
+    const totalRating = recipe.reviews.reduce((sum, review) => sum + review.rating, 0);
+    const avgRating = recipe.reviews.length > 0 ? totalRating / recipe.reviews.length : 0;
+
+    return {
+      ...recipe,
+      avgRating: avgRating,
+      reviews: undefined // Remove reviews array to reduce data size
+    };
   });
 
   return (
@@ -45,7 +58,7 @@ export default async function AccountPage() {
           <div>
             <h2 className="text-xl font-semibold">{user.name}</h2>
             <p className="text-gray-600">{user.email}</p>
-            <p className="text-sm text-gray-500 mt-1">{userRecipes.length} resep dibuat</p>
+            <p className="text-sm text-gray-500 mt-1">{recipesWithRating.length} resep dibuat</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -71,7 +84,7 @@ export default async function AccountPage() {
           </Link>
         </div>
         
-        {userRecipes.length === 0 ? (
+        {recipesWithRating.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <p className="mb-4">Anda belum membuat resep apapun.</p>
             <Link 
@@ -83,7 +96,7 @@ export default async function AccountPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {userRecipes.map((recipe) => (
+            {recipesWithRating.map((recipe) => (
               <MyRecipeCard key={recipe.id} recipe={recipe} />
             ))}
           </div>

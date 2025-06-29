@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import ReviewSection from '@/components/ReviewSection';
+import StarRating from '@/components/StarRating';
 
 const prisma = new PrismaClient();
 
@@ -13,6 +15,8 @@ export default async function RecipeDetail({ params }) {
       steps: true,
       author: { select: { name: true } },
       tags: { include: { tag: true } },
+      reviews: true,
+      _count: { select: { reviews: true } }
     },
   });
 
@@ -20,10 +24,22 @@ export default async function RecipeDetail({ params }) {
     return <div className="p-8 text-center text-red-500">Resep tidak ditemukan.</div>;
   }
 
+  // Calculate average rating
+  const totalRating = recipe.reviews.reduce((sum, review) => sum + review.rating, 0);
+  const avgRating = recipe.reviews.length > 0 ? totalRating / recipe.reviews.length : 0;
+
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded shadow">
       <h1 className="text-2xl font-bold mb-2">{recipe.title}</h1>
-      <div className="mb-2 text-gray-600">Oleh: {recipe.author?.name || "Unknown"}</div>
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-gray-600">Oleh: {recipe.author?.name || "Unknown"}</div>
+        <StarRating
+          rating={avgRating}
+          reviewCount={recipe._count.reviews}
+          showCount={true}
+          size="md"
+        />
+      </div>
 
       {/* Tags */}
       {recipe.tags && recipe.tags.length > 0 && (
@@ -63,6 +79,11 @@ export default async function RecipeDetail({ params }) {
             <li key={step.id} className="mb-2">{step.content}</li>
           ))}
       </ol>
+
+      {/* Review Section */}
+      <div className="mt-8 pt-8 border-t">
+        <ReviewSection recipeId={recipe.id} />
+      </div>
     </div>
   );
 }
