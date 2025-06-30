@@ -28,7 +28,7 @@ export default function ProfilePage() {
                 <h2 className="text-2xl font-semibold">Afung</h2>
               </div>
               <div className="mt-4 md:mt-0">
-                <button className="bg-red-400 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700">
+                <button className="bg-red-400 text-white px-4 py-2 rounded-full text-sm hover:bg-red-500 transition-colors">
                   Edit Profil
                 </button>
               </div>
