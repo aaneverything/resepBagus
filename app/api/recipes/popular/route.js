@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
 export async function GET() {
     try {
@@ -13,11 +14,14 @@ export async function GET() {
                 { createdAt: 'desc' }
             ],
             take: 6, // Top 6 popular recipes
+
         });
 
         // Calculate average rating for each recipe
         const recipesWithRating = popularRecipes.map(recipe => {
-            const totalRating = recipe.reviews.reduce((sum, review) => sum + review.rating, 0);
+            const totalRating = Array.isArray(recipe.reviews)
+                ? recipe.reviews.reduce((sum, review) => sum + review.rating, 0)
+                : 0;
             const avgRating = recipe.reviews.length > 0 ? (totalRating / recipe.reviews.length).toFixed(1) : 0;
 
             return {
@@ -31,9 +35,11 @@ export async function GET() {
             };
         });
 
-        return Response.json(recipesWithRating);
+        console.log("Popular Recipes:", recipesWithRating); // Debugging log
+
+        return NextResponse.json(recipesWithRating);
     } catch (error) {
         console.error('Error fetching popular recipes:', error);
-        return Response.json({ error: 'Failed to fetch popular recipes' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch popular recipes' }, { status: 500 });
     }
 }
