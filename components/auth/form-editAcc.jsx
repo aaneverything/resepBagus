@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Camera } from "lucide-react"; // pastikan lucide-react sudah terpasang
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -73,16 +74,25 @@ export default function EditAccountForm({ user }) {
             <AvatarImage src={preview} />
             <AvatarFallback>{name?.[0] || "U"}</AvatarFallback>
           </Avatar>
-          <div className="space-y-1">
-            <Label htmlFor="image">Foto Profil</Label>
-            <Input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              id="image"
-              onChange={handleImageChange}
-            />
-          </div>
+<div>
+  <input
+    type="file"
+    accept="image/*"
+    ref={fileInputRef}
+    onChange={handleImageChange}
+    className="hidden"
+    id="upload-photo"
+  />
+  
+  <label
+    htmlFor="upload-photo"
+    className="cursor-pointer flex items-center justify-center gap-2 border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 text-gray-600 text-sm rounded-lg px-4 py-3 transition-colors"
+  >
+    <Camera className="w-5 h-5" />
+    <span>Upload Foto</span>
+  </label>
+</div>
+
         </div>
 
         {/* Input Nama */}

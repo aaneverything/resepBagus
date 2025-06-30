@@ -7,6 +7,7 @@ import { signIn } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoginButton } from "../atoms/Button";
+import GoogleButton from "../auth/google-button"; // Pastikan ini adalah komponen yang benar
 
 const initialState = {
   success: false,
@@ -76,6 +77,13 @@ const FormLogin = () => {
         <a href="/register" className="text-blue-500 hover:underline">
           Register
         </a>
+      </div>
+
+      <div>
+        <a href="/auth/google" className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          Login with Google
+        </a>
+        <GoogleButton />
       </div>
     </form>
   );

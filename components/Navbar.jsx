@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Search, Loader2 } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import { Input } from "@/components/ui/input"
 
@@ -33,16 +34,19 @@ export default function Navbar() {
 
         {/* Navigation Links */}
         <nav className="hidden md:flex gap-6">
- <div className="flex w-full max-w-sm items-center gap-2">
-      <Input type="text" placeholder="Search recipes..." />
-      <Button type="submit" variant="outline">
-        Search
-      </Button>
-    </div>
+
         </nav>
 
         {/* Auth Section */}
         <div className="flex items-center gap-3">
+           <div className="flex w-full max-w-sm items-center gap-2">
+      <Button type="submit" variant="outline">
+        <Link href="/search">
+       <Search className="w-5 h-5" />
+        </Link>
+        
+      </Button>
+    </div>
           {status === "loading" ? (
             <Skeleton className="w-8 h-8 rounded-full" />
           ) : session?.user ? (

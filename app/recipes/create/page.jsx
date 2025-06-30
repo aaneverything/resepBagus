@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import RecipeStepItem from "@/components/RecipeStepItem"; // Buat komponen ini dari jawaban sebelumnya
@@ -12,6 +12,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Camera } from "lucide-react"; 
 
 export default function CreateRecipePage() {
   const { data: session, status } = useSession();
@@ -28,11 +30,13 @@ export default function CreateRecipePage() {
   const [success, setSuccess] = useState("");
   const fileInputRef = useRef();
 
-  if (status === "loading") return <div className="">Loading...</div>;
-  if (!session) {
-    if (typeof window !== "undefined") router.replace("/login");
-    return <div>Redirecting...</div>;
-  }
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/login");
+    }
+  }, [status, router]);
+
+  if (status === "loading") return <Skeleton className="h-12 w-full" />;
 
   const handleFotoChange = (e) => {
     const file = e.target.files[0];
@@ -184,15 +188,26 @@ export default function CreateRecipePage() {
         )}
 
         {/* Upload Foto */}
-        <div>
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            onChange={handleFotoChange}
-            className="border px-3 py-2 rounded w-full text-sm"
-          />
-        </div>
+
+<div>
+  <input
+    type="file"
+    accept="image/*"
+    ref={fileInputRef}
+    onChange={handleFotoChange}
+    className="hidden"
+    id="upload-photo"
+  />
+  
+  <label
+    htmlFor="upload-photo"
+    className="cursor-pointer flex items-center justify-center gap-2 border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 text-gray-600 text-sm rounded-lg px-4 py-3 transition-colors"
+  >
+    <Camera className="w-5 h-5" />
+    <span>Upload Foto</span>
+  </label>
+</div>
+
 
         {/* Deskripsi */}
         <div>

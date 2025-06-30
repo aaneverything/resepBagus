@@ -29,6 +29,7 @@ export default function RecipeStepItem({ step, onChange, onAdd, onDelete, onAddA
 
         {/* Tombol Add di luar Dropdown Menu */}
         <Button
+            type="button" 
           variant="outline"
           size="icon"
           className="h-8 w-8"
@@ -40,6 +41,7 @@ export default function RecipeStepItem({ step, onChange, onAdd, onDelete, onAddA
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
+            
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-muted-foreground hover:bg-muted/20"

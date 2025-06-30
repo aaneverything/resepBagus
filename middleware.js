@@ -34,5 +34,10 @@ export const config = {
         '/api/:path*',
         '/login',
         '/register',
-    ]
+        '/recipes/create',
+        '/recipes/edit/:id',
+        '/recipes/delete/:id',
+        '/recipes/:id',
+        '/forgot',
+    ],
 };

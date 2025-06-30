@@ -1,7 +1,9 @@
 "use client";
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { Camera, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function SearchBar() {
   const [bahan, setBahan] = useState("");
@@ -32,7 +34,6 @@ export default function SearchBar() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bahan: bahanArr, judul, top_n: 5 }),
       });
-
       const data = await res.json();
       setResults(Array.isArray(data) ? data : [data]);
     } catch (err) {
@@ -42,17 +43,12 @@ export default function SearchBar() {
     }
   };
 
-  const handlePhotoSearch = async (e) => {
-    e.preventDefault();
+  const handleImageChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
     setErrorMsg("");
     setLoading(true);
-
-    const file = fileInputRef.current.files?.[0];
-    if (!file) {
-      setErrorMsg("Pilih gambar terlebih dahulu.");
-      setLoading(false);
-      return;
-    }
 
     try {
       const formData = new FormData();
@@ -64,15 +60,11 @@ export default function SearchBar() {
       });
 
       const aiData = await aiRes.json();
-      console.log("AI response:", aiData);
+      let ingredients = Array.isArray(aiData)
+        ? aiData.map((item) => item.label).filter(Boolean)
+        : [];
 
-      // Extract labels from AI response array
-      let ingredients = [];
-      if (Array.isArray(aiData)) {
-        ingredients = aiData.map(item => item.label).filter(Boolean);
-      }
-
-      if (!ingredients || ingredients.length === 0) {
+      if (ingredients.length === 0) {
         setErrorMsg("Gambar tidak dikenali atau bahan tidak ditemukan.");
         setResults([]);
         return;
@@ -85,7 +77,6 @@ export default function SearchBar() {
       });
 
       const data = await res.json();
-      console.log("Search results:", data);
       setResults(Array.isArray(data) ? data : [data]);
     } catch (err) {
       setErrorMsg("Terjadi kesalahan saat pencarian.");
@@ -97,40 +88,41 @@ export default function SearchBar() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
       <form onSubmit={handleSearch} className="flex gap-2 mb-4">
-        <input
+        <Input
           type="text"
           value={bahan}
           onChange={(e) => setBahan(e.target.value)}
           placeholder="Cari resep dengan bahan (pisahkan koma) atau judul"
-          className="border px-4 py-2 rounded w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button
-          type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded transition"
-        >
+        <Button type="submit" className="text-white">
           Cari
-        </button>
-      </form>
-
-      <form onSubmit={handlePhotoSearch} className="flex gap-2 mb-4 items-center">
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="p-2"
+          onClick={() => fileInputRef.current?.click()}
+          title="Cari dengan Foto"
+        >
+          <Camera className="w-5 h-5" />
+        </Button>
         <input
           type="file"
           accept="image/*"
           ref={fileInputRef}
-          className="border px-3 py-2 rounded w-full"
+          onChange={handleImageChange}
+          className="hidden"
         />
-        <button
-          type="submit"
-          className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded transition"
-        >
-          Cari dengan Foto
-        </button>
       </form>
 
+      {/* Error Message */}
       {errorMsg && (
-        <div className="text-red-600 bg-red-100 p-3 rounded mb-4 text-sm">{errorMsg}</div>
+        <div className="text-red-600 bg-red-100 p-3 rounded mb-4 text-sm">
+          {errorMsg}
+        </div>
       )}
 
+      {/* Loading Indicator */}
       {loading && (
         <div className="flex items-center gap-2 text-blue-600 mb-4">
           <Loader2 className="animate-spin" size={20} />
@@ -138,6 +130,7 @@ export default function SearchBar() {
         </div>
       )}
 
+      {/* Hasil Pencarian */}
       {!loading && results.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
           {results.map((item, idx) =>
