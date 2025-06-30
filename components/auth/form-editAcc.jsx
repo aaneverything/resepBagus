@@ -1,5 +1,12 @@
 "use client";
 import { useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import Link from "next/link";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function EditAccountForm({ user }) {
   const [name, setName] = useState(user.name);
@@ -16,17 +23,18 @@ export default function EditAccountForm({ user }) {
       formData.append("image", fileInputRef.current.files[0]);
     }
 
-const res = await fetch("/api/account", {
-  method: "PUT",
-  body: formData,
-});
-let data = {};
-try {
-  data = await res.json();
-  setMessage(data.message);
-} catch (err) {
-  setMessage("Gagal update akun. Pastikan API mengembalikan JSON.");
-}
+    const res = await fetch("/api/account", {
+      method: "PUT",
+      body: formData,
+    });
+
+    let data = {};
+    try {
+      data = await res.json();
+      setMessage(data.message);
+    } catch (err) {
+      setMessage("Gagal update akun. Pastikan API mengembalikan JSON.");
+    }
   };
 
   const handleImageChange = (e) => {
@@ -37,30 +45,70 @@ try {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2">
-      <label className="block">
-        URL Foto:
-     <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          onChange={handleImageChange}
-          className="block mt-1"
-        />
-      </label>
-      <img src={preview} alt="Preview" className="w-20 h-20 rounded-full object-cover border" />
-      <label className="block">
-        Nama:
-        <input
-          className="border px-2 py-1 rounded ml-2"
-          value={name}
-          onChange={e => setName(e.target.value)}
-        />
-      </label>
-      <button className="bg-blue-500 text-white px-4 py-1 rounded" type="submit">
-        Simpan Perubahan
-      </button>
-      {message && <div className="text-green-600">{message}</div>}
-    </form>
+    <>
+    <div className="mx-auto mb-2">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/">Home</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/account">Resep</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      </div>
+    
+    <Card className="p-6 max-w-lg mx-auto space-y-4 shadow">
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Avatar Preview */}
+        <div className="flex items-center gap-4">
+          <Avatar className="w-20 h-20">
+            <AvatarImage src={preview} />
+            <AvatarFallback>{name?.[0] || "U"}</AvatarFallback>
+          </Avatar>
+          <div className="space-y-1">
+            <Label htmlFor="image">Foto Profil</Label>
+            <Input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              id="image"
+              onChange={handleImageChange}
+            />
+          </div>
+        </div>
+
+        {/* Input Nama */}
+        <div>
+          <Label htmlFor="name">Nama</Label>
+          <Input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="mt-1"
+          />
+        </div>
+
+        {/* Submit Button */}
+        <Button type="submit" className="w-full">
+          Simpan Perubahan
+        </Button>
+
+        {/* Feedback Message */}
+        {message && (
+          <div className="text-sm text-green-600 bg-green-100 px-3 py-2 rounded mt-2">
+            {message}
+          </div>
+        )}
+      </form>
+    </Card>
+    </>
   );
 }

@@ -3,7 +3,12 @@
 import { useActionState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { verifyOtp } from "@/lib/actions";
-import { signIn } from "next-auth/react";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
 import { LoginButton } from "../atoms/Button";
 
 
@@ -43,13 +48,28 @@ const FormVerify = () => {
         <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
           OTP
         </label>
-        <input
+         <InputOTP
+         type="text"
+        id="otp"
+        name="otp"
+        placeholder="Enter your OTP"
+      >
+        <InputOTPGroup>
+          <InputOTPSlot index={0} />
+          <InputOTPSlot index={1} />
+          <InputOTPSlot index={2} />
+          <InputOTPSlot index={3} />
+          <InputOTPSlot index={4} />
+          <InputOTPSlot index={5} />
+        </InputOTPGroup>
+      </InputOTP>
+        {/* <input
           type="text"
           id="otp"
           name="otp"
           placeholder="Enter your OTP"
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-        />
+        /> */}
         <div className="text-sm text-red-500 mt-1">{state.errors?.otp || ""}</div>
       </div>
 

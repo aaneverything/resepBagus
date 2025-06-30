@@ -1,5 +1,5 @@
 // PopularSection.js
-import RecipeList from "./RecipeList";
+import RecipeList from "../RecipeList";
 
 export default function PopularSection({ popularRecipes }) {
     return (

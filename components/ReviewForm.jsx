@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { Button } from './ui/button'; // Assuming you have a Button component
 
 const ReviewForm = ({ recipeId, onReviewSubmitted }) => {
   const { data: session } = useSession();
@@ -112,13 +113,13 @@ const ReviewForm = ({ recipeId, onReviewSubmitted }) => {
           />
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={loading || rating === 0}
-          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 transition"
+          className="text-white px-6 py-2 rounded disabled:bg-gray-400 transition"
         >
           {loading ? 'Mengirim...' : 'Kirim Review'}
-        </button>
+        </Button> 
       </form>
     </div>
   );

@@ -4,103 +4,102 @@ import { prisma } from "@/lib/prisma";
 import { LogoutButton } from "@/components/atoms/Button";
 import MyRecipeCard from "@/components/MyRecipeCard";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const PLACEHOLDER = "https://ui-avatars.com/api/?name=User&background=random";
 
 export default async function AccountPage() {
   const session = await auth();
-  if (!session?.user) {
-    redirect("/login");
-  }
+  if (!session?.user) redirect("/login");
 
-  // Ambil data user dari database
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
     select: { id: true, name: true, email: true, image: true },
   });
 
-  // Ambil resep-resep user
   const userRecipes = await prisma.recipe.findMany({
     where: { authorId: user.id },
     include: {
       ingredients: true,
       tags: { include: { tag: true } },
       reviews: true,
-      _count: { select: { reviews: true } }
+      _count: { select: { reviews: true } },
     },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: "desc" },
   });
 
-  // Calculate average rating for each recipe
-  const recipesWithRating = userRecipes.map(recipe => {
-    const totalRating = recipe.reviews.reduce((sum, review) => sum + review.rating, 0);
+  const recipesWithRating = userRecipes.map((recipe) => {
+    const totalRating = recipe.reviews.reduce((sum, r) => sum + r.rating, 0);
     const avgRating = recipe.reviews.length > 0 ? totalRating / recipe.reviews.length : 0;
-
-    return {
-      ...recipe,
-      avgRating: avgRating,
-      reviews: undefined // Remove reviews array to reduce data size
-    };
+    return { ...recipe, avgRating, reviews: undefined };
   });
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Akun Saya</h1>
-      
-      {/* Profile Section */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <div className="flex items-center gap-4 mb-4">
-          <img
-            src={user.image || PLACEHOLDER}
-            alt="Foto Profil"
-            className="w-20 h-20 rounded-full object-cover border"
-          />
-          <div>
-            <h2 className="text-xl font-semibold">{user.name}</h2>
-            <p className="text-gray-600">{user.email}</p>
-            <p className="text-sm text-gray-500 mt-1">{recipesWithRating.length} resep dibuat</p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white py-12 px-4">
+      <div className="max-w-5xl mx-auto space-y-10">
+        {/* Header */}
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Akun Saya</h1>
+          <p className="text-gray-500">Kelola profil dan resep buatanmu</p>
         </div>
-        <div className="flex gap-2">
-          <Link 
-            href="/account/edit" 
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-          >
-            Edit Profil
-          </Link>
-          <LogoutButton />
-        </div>
-      </div>
 
-      {/* My Recipes Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Resep Saya</h2>
-          <Link 
-            href="/recipes/create" 
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-          >
-            + Buat Resep Baru
-          </Link>
-        </div>
-        
-        {recipesWithRating.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <p className="mb-4">Anda belum membuat resep apapun.</p>
-            <Link 
-              href="/recipes/create"
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-            >
-              Buat Resep Pertama
+        {/* Profile Card */}
+        <Card className="p-6 flex flex-col md:flex-row items-center gap-6 shadow-lg">
+          <Avatar className="h-24 w-24 border shadow-md">
+            <AvatarImage src={user.image || PLACEHOLDER} />
+            <AvatarFallback className="bg-primary/10 text-primary font-bold text-xl">
+              {user.name?.charAt(0).toUpperCase() || "?"}
+            </AvatarFallback>
+          </Avatar>
+
+          <div className="flex-1 w-full">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full">
+              <div>
+                <h2 className="text-2xl font-semibold">{user.name}</h2>
+                <p className="text-gray-600">{user.email}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {recipesWithRating.length} resep dibuat
+                </p>
+              </div>
+
+              <div className="mt-4 sm:mt-0 flex gap-3">
+                <Link href="/account/edit">
+                  <Button variant="outline">Edit Profil</Button>
+                </Link>
+                <LogoutButton />
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Resep Saya */}
+        <Card className="p-6 shadow-md">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold text-gray-800">Resep Saya</h2>
+            <Link href="/recipes/create">
+              <Button className="bg-green-600 hover:bg-green-700 text-white shadow">
+                + Buat Resep Baru
+              </Button>
             </Link>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {recipesWithRating.map((recipe) => (
-              <MyRecipeCard key={recipe.id} recipe={recipe} />
-            ))}
-          </div>
-        )}
+
+          {recipesWithRating.length === 0 ? (
+            <div className="text-center text-gray-500 py-10 space-y-4">
+              <p>Anda belum membuat resep apapun.</p>
+              <Link href="/recipes/create">
+                <Button>📖 Buat Resep Pertama</Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {recipesWithRating.map((recipe) => (
+                <MyRecipeCard key={recipe.id} recipe={recipe} />
+              ))}
+            </div>
+          )}
+        </Card>
       </div>
     </div>
   );

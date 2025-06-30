@@ -1,7 +1,17 @@
 "use client";
+
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import RecipeStepItem from "@/components/RecipeStepItem"; // Buat komponen ini dari jawaban sebelumnya
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import Link from "next/link";
 
 export default function CreateRecipePage() {
   const { data: session, status } = useSession();
@@ -9,7 +19,7 @@ export default function CreateRecipePage() {
   const [judul, setJudul] = useState("");
   const [description, setDescription] = useState("");
   const [ingredients, setIngredients] = useState([""]);
-  const [steps, setSteps] = useState([""]);
+  const [steps, setSteps] = useState([{ id: Date.now(), text: "" }]);
   const [tags, setTags] = useState([""]);
   const [foto, setFoto] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -18,8 +28,7 @@ export default function CreateRecipePage() {
   const [success, setSuccess] = useState("");
   const fileInputRef = useRef();
 
-  // Redirect ke login jika belum login
-  if (status === "loading") return <div>Loading...</div>;
+  if (status === "loading") return <div className="">Loading...</div>;
   if (!session) {
     if (typeof window !== "undefined") router.replace("/login");
     return <div>Redirecting...</div>;
@@ -37,24 +46,31 @@ export default function CreateRecipePage() {
     }
   };
 
-  // Dynamic handlers
   const handleIngredientChange = (idx, value) => {
-    setIngredients(ings => ings.map((ing, i) => i === idx ? value : ing));
+    setIngredients((ings) => ings.map((ing, i) => (i === idx ? value : ing)));
   };
   const addIngredient = () => setIngredients([...ingredients, ""]);
-  const removeIngredient = idx => setIngredients(ings => ings.length > 1 ? ings.filter((_, i) => i !== idx) : ings);
+  const removeIngredient = (idx) => setIngredients((ings) => ings.length > 1 ? ings.filter((_, i) => i !== idx) : ings);
 
-  const handleStepChange = (idx, value) => {
-    setSteps(sts => sts.map((s, i) => i === idx ? value : s));
+  const updateStepText = (index, value) => {
+    const newSteps = [...steps];
+    newSteps[index].text = value;
+    setSteps(newSteps);
   };
-  const addStep = () => setSteps([...steps, ""]);
-  const removeStep = idx => setSteps(sts => sts.length > 1 ? sts.filter((_, i) => i !== idx) : sts);
+  const addStepAfter = (index) => {
+    const newSteps = [...steps];
+    newSteps.splice(index + 1, 0, { id: Date.now(), text: "" });
+    setSteps(newSteps);
+  };
+  const deleteStep = (index) => {
+    if (steps.length > 1) setSteps(steps.filter((_, i) => i !== index));
+  };
 
   const handleTagChange = (idx, value) => {
-    setTags(tgs => tgs.map((tag, i) => i === idx ? value : tag));
+    setTags((tgs) => tgs.map((tag, i) => (i === idx ? value : tag)));
   };
   const addTag = () => setTags([...tags, ""]);
-  const removeTag = idx => setTags(tgs => tgs.length > 1 ? tgs.filter((_, i) => i !== idx) : tgs);
+  const removeTag = (idx) => setTags((tgs) => tgs.length > 1 ? tgs.filter((_, i) => i !== idx) : tgs);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,10 +81,10 @@ export default function CreateRecipePage() {
     formData.append("judul", judul);
     formData.append("description", description);
     formData.append("ingredients", JSON.stringify(ingredients.filter(Boolean)));
-    formData.append("steps", JSON.stringify(steps.filter(Boolean)));
+    formData.append("steps", JSON.stringify(steps.map((s) => s.text).filter(Boolean)));
     formData.append("tags", JSON.stringify(tags.filter(Boolean)));
     if (foto) formData.append("foto", foto);
-    
+
     try {
       const res = await fetch("/api/recipes", {
         method: "POST",
@@ -77,7 +93,13 @@ export default function CreateRecipePage() {
       const data = await res.json();
       if (res.ok) {
         setSuccess("Resep berhasil dibuat!");
-        setJudul(""); setDescription(""); setIngredients([""]); setSteps([""]); setTags([""]); setFoto(null); setPreview(null);
+        setJudul("");
+        setDescription("");
+        setIngredients([""]);
+        setSteps([{ id: Date.now(), text: "" }]);
+        setTags([""]);
+        setFoto(null);
+        setPreview(null);
         setTimeout(() => router.push(`/recipes/${data.id}`), 1500);
       } else {
         setError(data.error || "Gagal membuat resep");
@@ -89,57 +111,152 @@ export default function CreateRecipePage() {
     }
   };
 
-  return (
-    <div className="max-w-xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Buat Resep Baru</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block font-medium mb-1">Judul Resep</label>
-          <input type="text" value={judul} onChange={e => setJudul(e.target.value)} required className="border px-3 py-2 rounded w-full" />
-        </div>
-        <div>
-          <label className="block font-medium mb-1">Deskripsi Resep</label>
-          <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} className="border px-3 py-2 rounded w-full" placeholder="Deskripsi singkat tentang resep ini..." />
-        </div>
-        <div>
-          <label className="block font-medium mb-1">Bahan-bahan</label>
-          {ingredients.map((ing, idx) => (
-            <div key={idx} className="flex gap-2 mb-1">
-              <input type="text" value={ing} onChange={e => handleIngredientChange(idx, e.target.value)} required className="border px-3 py-2 rounded w-full" placeholder={`Bahan ${idx+1}`} />
-              <button type="button" onClick={() => removeIngredient(idx)} className="px-2 text-red-500">-</button>
-              {idx === ingredients.length-1 && <button type="button" onClick={addIngredient} className="px-2 text-green-600">+</button>}
-            </div>
-          ))}
-        </div>
-        <div>
-          <label className="block font-medium mb-1">Langkah-langkah</label>
-          {steps.map((step, idx) => (
-            <div key={idx} className="flex gap-2 mb-1">
-              <input type="text" value={step} onChange={e => handleStepChange(idx, e.target.value)} required className="border px-3 py-2 rounded w-full" placeholder={`Langkah ${idx+1}`} />
-              <button type="button" onClick={() => removeStep(idx)} className="px-2 text-red-500">-</button>
-              {idx === steps.length-1 && <button type="button" onClick={addStep} className="px-2 text-green-600">+</button>}
-            </div>
-          ))}
-        </div>
-        <div>
-          <label className="block font-medium mb-1">Tags/Kategori</label>
-          {tags.map((tag, idx) => (
-            <div key={idx} className="flex gap-2 mb-1">
-              <input type="text" value={tag} onChange={e => handleTagChange(idx, e.target.value)} className="border px-3 py-2 rounded w-full" placeholder={`Tag ${idx+1} (misal: Makanan Sehat, Dessert, dll)`} />
-              <button type="button" onClick={() => removeTag(idx)} className="px-2 text-red-500">-</button>
-              {idx === tags.length-1 && <button type="button" onClick={addTag} className="px-2 text-green-600">+</button>}
-            </div>
-          ))}
-        </div>
-        <div>
-          <label className="block font-medium mb-1">Foto Resep (opsional)</label>
-          <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFotoChange} className="border px-3 py-2 rounded w-full" />
-          {preview && <img src={preview} alt="Preview" className="mt-2 max-h-40 rounded" />}
-        </div>
-        {error && <div className="text-red-500">{error}</div>}
-        {success && <div className="text-green-600">{success}</div>}
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded" disabled={loading}>{loading ? "Menyimpan..." : "Buat Resep"}</button>
-      </form>
+  
+
+ return (
+  <div className="min-h-screen bg-gray-50 py-8">
+    <div className="max-w-xl mx-auto px-1 mb-2">
+                <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/">Home</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/recipes">Resep</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
     </div>
-  );
+
+    <main className="max-w-xl mx-auto p-6 space-y-6 border rounded-xl shadow-md bg-white">
+      {/* Header & Save button */}
+      
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-800">Buat Resep Baru</h1>
+        <button
+          type="submit"
+          onClick={handleSubmit}
+          className="bg-pink-100 text-pink-600 px-4 py-1 rounded-full shadow-sm text-sm hover:bg-pink-200 disabled:opacity-50"
+          disabled={loading}
+        >
+          {loading ? "Menyimpan..." : "Save"}
+        </button>
+      </div>
+
+      {/* Notifikasi */}
+      {error && (
+        <div className="text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded text-sm">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="text-green-700 bg-green-50 border border-green-200 px-3 py-2 rounded text-sm">
+          {success}
+        </div>
+      )}
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Judul */}
+        <div>
+          <label className="block font-medium text-sm text-gray-700 mb-1">Judul Resep :</label>
+          <input
+            type="text"
+            value={judul}
+            onChange={(e) => setJudul(e.target.value)}
+            required
+            className="border px-3 py-2 rounded w-full focus:outline-none focus:ring focus:border-pink-300"
+          />
+        </div>
+
+        {/* Preview Foto */}
+        {preview && (
+          <img
+            src={preview}
+            alt="Preview"
+            className="w-full max-h-64 object-cover rounded-md shadow"
+          />
+        )}
+
+        {/* Upload Foto */}
+        <div>
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleFotoChange}
+            className="border px-3 py-2 rounded w-full text-sm"
+          />
+        </div>
+
+        {/* Deskripsi */}
+        <div>
+          <label className="block font-medium text-sm text-gray-700 mb-1">Deskripsi :</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={2}
+            className="border px-3 py-2 rounded w-full resize-none focus:outline-none focus:ring focus:border-pink-300"
+          />
+        </div>
+
+        {/* Bahan */}
+        <div>
+          <label className="block font-medium text-sm text-gray-700 mb-2">Bahan :</label>
+          <div className="space-y-2">
+            {ingredients.map((ing, idx) => (
+              <RecipeStepItem
+                key={idx}
+                step={ing}
+                onChange={(value) => handleIngredientChange(idx, value)}
+                onAdd={() => addIngredient(idx)}
+                onDelete={() => removeIngredient(idx)}
+                onAddAttachment={() => handleAddAttachment(idx)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Langkah */}
+        <div>
+          <label className="block font-medium text-sm text-gray-700 mb-2">Cara Memasak :</label>
+          <div className="space-y-2">
+            {steps.map((step, index) => (
+              <RecipeStepItem
+                key={step.id}
+                step={step}
+                onChange={(value) => updateStepText(index, value)}
+                onAdd={() => addStepAfter(index)}
+                onDelete={() => deleteStep(index)}
+                onAddAttachment={() => handleAddAttachment(index)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Tags */}
+        <div>
+          <label className="block font-medium text-sm text-gray-700 mb-2">Tags/Kategori :</label>
+          <div className="space-y-2">
+            {tags.map((tag, idx) => (
+              <RecipeStepItem
+                key={idx}
+                step={tag}
+                onChange={(value) => handleTagChange(idx, value)}
+                onAdd={() => addTag(idx)}
+                onDelete={() => removeTag(idx)}
+                onAddAttachment={() => handleAddAttachment(idx)}
+              />
+            ))}
+          </div>
+        </div>
+      </form>
+    </main>
+  </div>
+);
 }

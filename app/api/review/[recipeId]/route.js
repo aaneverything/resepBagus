@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 // GET - Get reviews for a specific recipe
 export async function GET(request, { params }) {
     try {
-        const { recipeId } = params;
+        const { recipeId } = await params;
 
         const reviews = await prisma.review.findMany({
             where: { recipeId },

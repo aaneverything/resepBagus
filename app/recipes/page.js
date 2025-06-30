@@ -1,8 +1,10 @@
-export default function Recipes() {
+import RecipeList from '@/components/RecipeList'
+import React from 'react'
+
+const route = () => {
   return (
-    <div>
-      <h1>All Recipes</h1>
-      <p>Browse our collection of delicious recipes!</p>
-    </div>
-  );
+   <RecipeList />
+  )
 }
+
+export default route

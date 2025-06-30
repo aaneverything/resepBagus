@@ -4,6 +4,8 @@ import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { loginCredentials } from "@/lib/actions";
 import { signIn } from "next-auth/react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { LoginButton } from "../atoms/Button";
 
 const initialState = {
@@ -24,13 +26,13 @@ const FormLogin = () => {
       signIn("credentials", {
         email: state.email,
         password: state.password,
-        callbackUrl: "/dashboard",
+        callbackUrl: "/",
       });
     }
   }, [state]);
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form action={formAction} className="space-y-5">
       {state.message && (
         <div className="p-4 mb-4 text-sm text-red-500 bg-red-100 rounded-md" role="alert">
           <span className="font-medium">{state.message}</span>
@@ -38,40 +40,37 @@ const FormLogin = () => {
       )}
 
       <div className="mb-4">
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          Email
-        </label>
-        <input
+        <Label htmlFor="email" className="mb-1 block">Email</Label>
+        <Input
           type="email"
           id="email"
           name="email"
           placeholder="Enter your email"
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
         />
         <div className="text-sm text-red-500 mt-1">{state.errors?.email || ""}</div>
       </div>
 
       <div className="mb-4">
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-          Password
-        </label>
-        <input
+        <Label htmlFor="password" className="mb-1 block">Password</Label>
+        <Input
           type="password"
           id="password"
           name="password"
           placeholder="********"
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
         />
         <div className="text-sm text-red-500 mt-1">{state.errors?.password || ""}</div>
       </div>
-      <LoginButton />
+
+      <LoginButton/>
+
       <div className="flex items-center justify-between mt-4">
         <div className="text-sm">
           <a href="/forgot" className="text-blue-500 hover:underline">
             Forgot password?
           </a>
         </div>
-        </div>
+      </div>
+
       <div className="mt-4 text-sm text-gray-600">
         Don&apos;t have an account yet?{" "}
         <a href="/register" className="text-blue-500 hover:underline">

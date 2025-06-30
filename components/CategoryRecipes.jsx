@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { Skeleton } from "./ui/skeleton";
 
 export default function CategoryRecipes() {
   const [categories, setCategories] = useState([]);
@@ -36,7 +37,14 @@ export default function CategoryRecipes() {
   };
 
   if (loading) {
-    return <div className="text-gray-500">Loading categories...</div>;
+    // Show skeleton loading state while fetching categories
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[...Array(6)].map((_, index) => (
+          <Skeleton key={index} className="h-12 w-full rounded-lg" />
+        ))}
+      </div>
+    ) ;
   }
 
   return (

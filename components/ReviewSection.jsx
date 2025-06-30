@@ -14,13 +14,11 @@ const ReviewSection = ({ recipeId }) => {
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-bold text-gray-900">Reviews</h2>
-      
       {/* Review Form */}
       <ReviewForm 
         recipeId={recipeId} 
         onReviewSubmitted={handleReviewSubmitted}
       />
-      
       {/* Reviews List */}
       <ReviewsList 
         recipeId={recipeId} 
