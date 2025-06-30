@@ -32,7 +32,9 @@ jobs:
         username: ${{ secrets.VPS_USERNAME }}
         key: ${{ secrets.VPS_SSH_KEY }}
         script: |
-          docker pull ${{ secrets.DOCKER_USERNAME }}/ourrecipes:latest
-          docker stop ourrecipes || true
-          docker rm ourrecipes || true
-          docker run -d --name ourrecipes -p 80:3000 ${{ secrets.DOCKER_USERNAME }}/ourrecipes:latest
+          cd ~/Resepku
+          git pull origin main
+
+          docker compose pull
+          docker compose down
+          docker compose up -d --build
