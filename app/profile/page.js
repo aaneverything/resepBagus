@@ -14,7 +14,7 @@ export default function ProfilePage() {
           <div className="flex-shrink-0">
             <Image
               src="/images/profile.jpg"
-              alt="Jeremy Rose"
+              alt="Afung"
               width={160}
               height={160}
               className="rounded-xl object-cover"
@@ -25,11 +25,10 @@ export default function ProfilePage() {
           <div className="flex-1 w-full">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div>
-                <h2 className="text-2xl font-semibold">Jeremy Rose</h2>
-                <p className="text-blue-600 text-sm">Product Designer • New York, NY</p>
+                <h2 className="text-2xl font-semibold">Afung</h2>
               </div>
               <div className="mt-4 md:mt-0">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700">
+                <button className="bg-red-400 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700">
                   Edit Profil
                 </button>
               </div>
@@ -42,7 +41,7 @@ export default function ProfilePage() {
                 <p className="text-blue-600">+1 123 456 7890</p>
 
                 <h4 className="font-semibold mt-4 mb-1">Email</h4>
-                <p className="text-blue-600">hello@jeremyrose.com</p>
+                <p className="text-blue-600">hello@afung.com</p>
               </div>
 
               <div>
@@ -58,7 +57,7 @@ export default function ProfilePage() {
 
         {/* Resep yang Pernah Dibuat */}
         <section>
-          <h2 className="text-xl font-bold mb-4">Resep yang Pernah Dibuat</h2>
+          <h2 className="text-xl font-bold mb-4">Resepku</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {/* Kartu resep dummy */}
             {[1, 2, 3].map((i) => (
