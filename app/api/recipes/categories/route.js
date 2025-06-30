@@ -10,7 +10,10 @@ export async function GET() {
             orderBy: { name: 'asc' }
         });
 
-        return NextResponse.json(categories);
+        // Fallback to ensure categories is an array
+        const safeCategories = Array.isArray(categories) ? categories : [];
+
+        return NextResponse.json(safeCategories);
     } catch (error) {
         console.error('Error fetching categories:', error);
         return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 });

@@ -17,8 +17,11 @@ export async function GET() {
 
         });
 
+        // Fallback to ensure popularRecipes is an array
+        const safePopularRecipes = Array.isArray(popularRecipes) ? popularRecipes : [];
+
         // Calculate average rating for each recipe
-        const recipesWithRating = popularRecipes.map(recipe => {
+        const recipesWithRating = safePopularRecipes.map(recipe => {
             const totalRating = Array.isArray(recipe.reviews)
                 ? recipe.reviews.reduce((sum, review) => sum + review.rating, 0)
                 : 0;
@@ -37,7 +40,7 @@ export async function GET() {
 
         console.log("Popular Recipes:", recipesWithRating); // Debugging log
 
-        return NextResponse.json(recipesWithRating);
+        return NextResponse.json(Array.isArray(recipesWithRating) ? recipesWithRating : []);
     } catch (error) {
         console.error('Error fetching popular recipes:', error);
         return NextResponse.json({ error: 'Failed to fetch popular recipes' }, { status: 500 });
