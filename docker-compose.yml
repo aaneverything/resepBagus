@@ -3,10 +3,10 @@ services:
   db:
     image: postgres
     restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: myrecipes
+environment:
+  POSTGRES_USER: resepUser
+  POSTGRES_PASSWORD: resepkunjir
+  POSTGRES_DB: resepku
     ports:
       - "5432:5432"
     volumes:
