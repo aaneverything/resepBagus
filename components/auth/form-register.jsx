@@ -29,7 +29,7 @@ const FormRegister = () => {
         <form action={formAction} className="space-y-5">
             {state?.message && (
                 <div className="p-4 mb-4 text-sm text-red-500 bg-red-100 rounded-md" role="alert" aria-live="polite" aria-atomic="true">
-                    <span className="font-medium">{state.message}</span>
+                    <span className="font-medium">{state.errors}</span>
                 </div>
             )}
 
@@ -64,9 +64,7 @@ const FormRegister = () => {
                     <span className="text-red-500">{state?.errors?.confirmPassword || ""}</span>
                 </div>
             </div>
-
             <RegisterButton/>
-
             <div className="mt-4 text-sm text-gray-600">
                 Already have an account? <a href="/login" className="text-blue-500 hover:underline">Login</a>
             </div>

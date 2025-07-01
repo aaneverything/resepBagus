@@ -58,14 +58,7 @@ const FormVerify = () => {
         /> 
           <div className="text-sm text-red-500 mt-1">{state.errors?.otp || ""}</div>
         </div>
-
         <LoginButton />
-        <div className="mt-4 text-sm text-gray-600">
-          Don&apos;t have an account yet?{" "}
-          <a href="/auth/register" className="text-blue-500 hover:underline">
-            Register
-          </a>
-        </div>
       </form>
     </Suspense>
   );

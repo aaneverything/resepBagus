@@ -113,7 +113,9 @@ export default function EditAccountForm({ user }) {
 
         {/* Feedback Message */}
         {message && (
-          <div className="text-sm text-green-600 bg-green-100 px-3 py-2 rounded mt-2">
+          <div
+            className={`text-sm px-3 py-2 rounded mt-2 ${res.ok ? "text-green-600 bg-green-100" : "text-red-600 bg-red-100"}`}
+          >
             {message}
           </div>
         )}

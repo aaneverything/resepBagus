@@ -10,7 +10,7 @@ const GoogleButton = () => {
   return (
     <Button
       onClick={(e) => { e.preventDefault(); handleSignIn(); }}
-      className="px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
+      className="px-4 py-2 rounded transition duration-200"
     >
       Login with Google
     </Button>

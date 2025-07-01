@@ -40,8 +40,13 @@ export default function CreateRecipePage() {
 
   const handleFotoChange = (e) => {
     const file = e.target.files[0];
-    setFoto(file);
     if (file) {
+      const maxSize = 5 * 1024 * 1024; // 5 MB
+      if (file.size > maxSize) {
+        setError("Ukuran foto terlalu besar. Maksimal 5 MB.");
+        return;
+      }
+      setFoto(file);
       const reader = new FileReader();
       reader.onloadend = () => setPreview(reader.result);
       reader.readAsDataURL(file);
