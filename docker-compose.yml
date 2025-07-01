@@ -19,9 +19,12 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - DATABASE_URL=postgresql://resepUser:resepkunjir@db:5432/resepku
     depends_on:
+      - public-uploads:/public/uploads
       - db
     env_file:
       - .env
 
 volumes: 
   postgres-data:
+  public-uploads:
+
