@@ -28,7 +28,6 @@ const FormVerify = () => {
 
   useEffect(() => {
     if (state.success) {
-      // Redirect ke login setelah verifikasi sukses
       router.push(`/login`);
     }
   }, [state, router]);

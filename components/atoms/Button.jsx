@@ -38,7 +38,7 @@ export const ResetPasswordButton = () => {
   return (
     <Button
       type="submit"
-      className="w-full bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+      className="w-full"
       disabled={pending}
     >
       {pending ? "Resetting Password..." : "Reset Password"}
