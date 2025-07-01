@@ -153,7 +153,7 @@ export default function SearchBar() {
           {results.map((item, idx) =>
             item.id ? (
               <Link
-                key={idx}
+                key={item.id || idx}
                 href={`/recipes/${item.id}`}
                 className="group block rounded-xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 p-5 shadow-sm hover:shadow-lg transition-shadow duration-300"
               >
@@ -169,7 +169,7 @@ export default function SearchBar() {
               </Link>
             ) : (
               <div
-                key={idx}
+                key={item.id || idx}
                 className="rounded-xl border border-dashed border-red-300 bg-red-50 p-5 shadow-sm"
               >
                 <h3 className="text-lg font-semibold text-red-600 mb-1">
