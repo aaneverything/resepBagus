@@ -1,5 +1,6 @@
 "use client";
 import { signIn } from "next-auth/react";
+import { Button } from "../ui/button";
 
 const GoogleButton = () => {
   const handleSignIn = async () => {
@@ -7,12 +8,12 @@ const GoogleButton = () => {
   };
 
   return (
-    <button
+    <Button
       onClick={(e) => { e.preventDefault(); handleSignIn(); }}
-      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
+      className="px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
     >
       Login with Google
-    </button>
+    </Button>
   );
 };
 

@@ -12,7 +12,6 @@ async function updateImages() {
     .on('data', (row) => {
       const { Title, Image_Sources } = row;
 
-      // Tambahkan operasi update ke array
       updates.push(
         prisma.recipe.updateMany({
           where: { title: Title },
