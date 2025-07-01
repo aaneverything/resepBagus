@@ -55,9 +55,7 @@ export async function POST(req) {
         }
 
         const data = await res.json();
-        console.log("AI Search response:", data);
         const result = Array.isArray(data) ? data : [data];
-        console.log("AI Search results:", result);
 
         const allRecipes = await prisma.recipe.findMany({
             include: {
@@ -71,12 +69,12 @@ export async function POST(req) {
         const matched = result.map((item) => {
             const normJudulAI = normalize(item.judul || "");
             const match = allRecipes.find((r) =>
-                normalize(r.title).includes(normJudulAI) ||
+                normalize(r.title) === normJudulAI &&
                 r.ingredients.some(ing => normalize(item.bahan || "").includes(normalize(ing.name)))
             );
             return {
                 ...item,
-                id: match?.id || null,
+                id: match?.id || `temp-${item.index}`,
                 author: match?.author?.name || null,
             };
         });
