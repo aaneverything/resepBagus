@@ -39,14 +39,14 @@ export default function Navbar() {
 
         {/* Auth Section */}
         <div className="flex items-center gap-3">
-           <div className="flex w-full max-w-sm items-center gap-2">
-      <Button type="submit" variant="outline">
-        <Link href="/search">
-       <Search className="w-5 h-5" />
-        </Link>
-        
-      </Button>
-    </div>
+          <div className="flex w-full max-w-sm items-center gap-2">
+            <Button type="submit" variant="outline">
+              <Link href="/search">
+                <Search className="w-5 h-5" />
+              </Link>
+
+            </Button>
+          </div>
           {status === "loading" ? (
             <Skeleton className="w-8 h-8 rounded-full" />
           ) : session?.user ? (

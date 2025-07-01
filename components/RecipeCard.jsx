@@ -40,7 +40,7 @@ export default function RecipeCard({ recipe }) {
               )}
             </div>
           )}
-          
+
           {recipe.avgRating > 0 && (
             <div className="flex items-center gap-2">
               <StarRating rating={recipe.avgRating} size="sm" />

@@ -44,7 +44,7 @@ export default function CategoryRecipes() {
           <Skeleton key={index} className="h-12 w-full rounded-lg" />
         ))}
       </div>
-    ) ;
+    );
   }
 
   return (
@@ -55,11 +55,10 @@ export default function CategoryRecipes() {
           <button
             key={category.id}
             onClick={() => fetchCategoryRecipes(category.id)}
-            className={`px-3 py-1 rounded-full text-sm transition ${
-              selectedCategory === category.id
+            className={`px-3 py-1 rounded-full text-sm transition ${selectedCategory === category.id
                 ? "bg-blue-500 text-white"
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
+              }`}
           >
             {category.name} ({category._count.recipes})
           </button>

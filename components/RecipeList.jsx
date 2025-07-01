@@ -8,37 +8,37 @@ import { Star } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
 
 export default function RecipeList() {
-      const [loading, setLoading] = useState(true);
-      const [recipes, setRecipes] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [recipes, setRecipes] = useState([]);
 
-      useEffect(() => {
+    useEffect(() => {
         const fetchRecipes = async () => {
-          try {
-            const res = await fetch("/api/recipes/popular");
-            const data = await res.json();
-            setRecipes(data);
-          } catch (error) {
-            console.error("Error fetching recipes:", error);
-          } finally {
-            setLoading(false);
-          }
+            try {
+                const res = await fetch("/api/recipes/popular");
+                const data = await res.json();
+                setRecipes(data);
+            } catch (error) {
+                console.error("Error fetching recipes:", error);
+            } finally {
+                setLoading(false);
+            }
         };
         fetchRecipes();
-      }, []);
+    }, []);
 
-      if (loading) {
+    if (loading) {
         return (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[...Array(10)].map((_, index) => (
-              <Skeleton key={index} className="h-60 w-full rounded-lg" />
-            ))}
-          </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {[...Array(10)].map((_, index) => (
+                    <Skeleton key={index} className="h-60 w-full rounded-lg" />
+                ))}
+            </div>
         );
-      }
+    }
 
-      if (recipes.length === 0) {
+    if (recipes.length === 0) {
         return <div className="text-gray-500">Belum ada resep populer.</div>;
-      }
+    }
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
