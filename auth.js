@@ -6,7 +6,12 @@ import Credentials from "next-auth/providers/credentials";
 import { loginSchema } from "./lib/zod";
 import bcrypt from "bcryptjs";
 
+export const authOptions = {
+  trustHost: true, // Trust the host for NextAuth
+};
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true,
   adapter: PrismaAdapter(prisma),
   pages: {
     signIn: "/login",

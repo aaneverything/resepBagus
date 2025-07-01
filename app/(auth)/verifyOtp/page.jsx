@@ -1,20 +1,11 @@
-import FormVerify from '@/components/auth/form-verify';
-import React from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Suspense } from "react";
+import VerifyClientWrapper from "./VerifyClientWrapper";
 
-const Verify = () => {
+export default function VerifyPage() {
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
-      <Card className="w-full max-w-md shadow-md">
-        <CardHeader>
-          <h1 className="text-xl font-bold text-center">Verify Your Account</h1>
-        </CardHeader>
-        <CardContent>
-          <FormVerify />
-        </CardContent>
-      </Card>
-    </div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <VerifyClientWrapper />
+    </Suspense>
   );
-};
+}
 
-export default Verify;

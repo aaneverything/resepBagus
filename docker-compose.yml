@@ -3,10 +3,10 @@ services:
   db:
     image: postgres
     restart: always
-environment:
-  POSTGRES_USER: resepUser
-  POSTGRES_PASSWORD: resepkunjir
-  POSTGRES_DB: resepku
+    environment:
+      POSTGRES_USER: resepUser
+      POSTGRES_PASSWORD: resepkunjir
+      POSTGRES_DB: resepku
     ports:
       - "5432:5432"
     volumes:
@@ -15,14 +15,11 @@ environment:
     build: .
     ports:
       - "3000:3000"
-    volumes:
-      - .:/app
-      - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - DATABASE_URL=postgresql://resepUser:resepkunjir@db:5432/resepku
     depends_on:
       - db
-    command: sh -c "npx prisma generate && npm run dev"
     env_file:
       - .env
 

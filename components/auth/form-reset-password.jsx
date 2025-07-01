@@ -2,7 +2,7 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { use, useActionState } from "react";
 import { resetPassword } from "@/lib/actions";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -23,28 +23,36 @@ export default function FormResetPassword() {
     }
   }, [state.success, router]);
 
-  if (!token || !email) return <div className="text-red-500">Token tidak valid.</div>;
+  if (!token || !email)
+    return <div className="text-red-500">Token tidak valid.</div>;
 
   return (
-   <form action={formAction} className="space-y-6 rounded-lg shadow-md max-w-md mx-auto">
-  <input type="hidden" name="token" value={token} />
-  <input type="hidden" name="email" value={email} />
+    <Suspense fallback={<div>Loading...</div>}>
+      <form
+        action={formAction}
+        className="space-y-6 rounded-lg shadow-md max-w-md mx-auto"
+      >
+        <input type="hidden" name="token" value={token} />
+        <input type="hidden" name="email" value={email} />
 
-  <div className="">
-    <Label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-      Password Baru
-    </Label>
-    <Input
-      type="password"
-      id="password"
-      name="password"
-      placeholder="Masukkan password baru"
-      required
-      className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-    />
-  </div>
-<ResetPasswordButton />
-</form>
-
+        <div className="">
+          <Label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Password Baru
+          </Label>
+          <Input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Masukkan password baru"
+            required
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+        <ResetPasswordButton />
+      </form>
+    </Suspense>
   );
 }
