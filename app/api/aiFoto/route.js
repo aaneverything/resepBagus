@@ -4,8 +4,12 @@ export async function POST(req) {
     const formData = await req.formData();
     const file = formData.get("image");
 
-    if (!file || typeof file !== "object" || file.size === 0) {
+    if (!(file instanceof File) || file.size === 0) {
         return Response.json({ message: "No image provided" }, { status: 400 });
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        return Response.json({ message: "File terlalu besar" }, { status: 400 });
     }
 
     // 1. Siapkan data untuk AI API

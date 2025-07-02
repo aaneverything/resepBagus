@@ -71,21 +71,21 @@ export default function SearchBar() {
       }
 
       const aiData = await aiRes.json();
-      let ingredients = Array.isArray(aiData)
+      let fotoResult = Array.isArray(aiData)
         ? aiData.map((item) => item.label).filter(Boolean)
         : [];
 
-      if (ingredients.length === 0) {
-        setErrorMsg("Gambar tidak dikenali atau bahan tidak ditemukan.");
-        setResults([]);
-        setLoading(false);
-        return;
-      }
+      // if (fotoResult.length === 0) {
+      //   setErrorMsg("Gambar tidak dikenali atau bahan tidak ditemukan.");
+      //   setResults([]);
+      //   setLoading(false);
+      //   return;
+      // }
 
       const res = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bahan: ingredients, top_n: 5 }),
+        body: JSON.stringify({ bahan: fotoResult, top_n: 5 }),
       });
 
       if (!res.ok) {
@@ -95,7 +95,11 @@ export default function SearchBar() {
       }
 
       const data = await res.json();
-      setResults(Array.isArray(data) ? data : [data]);
+      if (!Array.isArray(data)) {
+        setErrorMsg("Respon tidak valid dari server.");
+        return;
+      }
+      setResults(data);
     } catch (err) {
       setErrorMsg("Terjadi kesalahan saat pencarian.");
     } finally {

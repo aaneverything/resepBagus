@@ -13,7 +13,7 @@ export async function GET() {
                 { reviews: { _count: 'desc' } }, // Order by review count
                 { createdAt: 'desc' }
             ],
-            take: 6, // Top 6 popular recipes
+            take: 8, // Top 6 popular recipes
 
         });
 
@@ -37,9 +37,6 @@ export async function GET() {
                 reviewCount: recipe._count.reviews,
             };
         });
-
-        console.log("Popular Recipes:", recipesWithRating); // Debugging log
-
         return NextResponse.json(Array.isArray(recipesWithRating) ? recipesWithRating : []);
     } catch (error) {
         console.error('Error fetching popular recipes:', error);
