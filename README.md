@@ -26,31 +26,26 @@ app/
 ├── api/
 │   ├── auth/[…nextauth]/route.js         → NextAuth API handler
 │   ├── search/
-│   │   ├── text/route.js                 → Search by text
-│   │   └── image/route.js                → Search by image (upload & ML)
+│   │   ├── route.js                      → Search recipes by text or image
 │   ├── recipes/
-│   │   ├── route.js                      → Create recipe (if needed)
+│   │   ├── route.js                      → Create recipe
 │   │   ├── [id]/route.js                 → Get/update/delete recipe
-│   │   └── popular/route.js              → Get popular recipes
-│   ├── categories/route.js               → Get categories
-│   └── reviews/
-│       ├── route.js                      → Post review (protected)
-│       └── [recipeId]/route.js           → Get all reviews for recipe
+│   │   ├── popular/route.js              → Get popular recipes
+│   └── categories/route.js               → Get categories
 │
 ├── recipes/
 │   ├── [id]/
-│   │   └── page.js                       → Detail resep
-│   └── page.js                           → List resep
+│   │   └── page.js                       → Recipe detail page
+│   └── page.js                           → Recipe listing page
 │
 ├── signin/
-│   └── page.js                           → Halaman login
+│   └── page.js                           → Login page
 │
 ├── dashboard/
-│   └── page.js                           → Rekomendasi, kategori, populer
+│   └── page.js                           → Dashboard with recommendations
 │
-├── layout.js
-└── page.js                               → Redirect ke /dashboard
-
+├── layout.js                             → Root layout
+└── page.js                               → Redirect to /dashboard
 ```
 
 ## 🔗 API Endpoints
@@ -74,6 +69,7 @@ Retrieve all recipes from the database.
       "cookingTime": 30,
       "servings": 4,
       "imageUrl": "https://example.com/image.jpg",
+      "author": "John Doe",
       "createdAt": "2025-06-08T10:00:00Z",
       "updatedAt": "2025-06-08T10:00:00Z"
     }
@@ -111,6 +107,7 @@ Create a new recipe.
     "cookingTime": 45,
     "servings": 6,
     "imageUrl": "https://example.com/image.jpg",
+    "author": "Jane Smith",
     "createdAt": "2025-06-08T11:00:00Z",
     "updatedAt": "2025-06-08T11:00:00Z"
   },
@@ -237,6 +234,20 @@ export async function createRecipe(recipeData) {
 - **Utilities**: camelCase (e.g., `db.js`)
 
 ## 🏗️ Architecture
+
+### Deployment Overview
+
+This project is deployed using a modern and scalable architecture:
+
+1. **Docker Hub**: The application is containerized using Docker, ensuring consistent environments across development and production. The Docker image is pushed to Docker Hub for easy distribution.
+
+2. **GitHub Actions**: Continuous Integration and Deployment (CI/CD) pipelines are set up using GitHub Actions. These pipelines automate the process of building Docker images, running tests, and deploying updates.
+
+3. **VPS Deployment**: The application is hosted on a Virtual Private Server (VPS), providing full control over the server environment. Docker Compose is used to manage containers on the VPS.
+
+4. **SSL with Certbot**: Certbot is used to generate and manage SSL certificates, ensuring secure HTTPS connections for the application.
+
+5. **Nginx Reverse Proxy**: Nginx is configured as a reverse proxy to route traffic to the application containers. It also handles SSL termination and provides caching and load balancing capabilities.
 
 ### Frontend Structure
 ```
